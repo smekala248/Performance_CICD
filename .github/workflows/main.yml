@@ -1,35 +1,39 @@
-name: Performance Pipeline Practice
+name: Run JMeter Tests
 
 on:
- workflow_dispatch:
+  workflow_dispatch:
+
 jobs:
- performance-test:
-  runs-on: ubuntu-latest
-  steps:
-   - name: checkout code
-     uses: actions/checkout@v3
+  jmeter-test:
+    runs-on: ubuntu-latest
 
-   - name: Install Jmeter
-     run: |
-       sudo apt update
-       sudo apt install -y jmeter
-       - name: Run Jmter Test
-       run: |
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
-       jmeter -n -t satish.jmx \
-        -l results.jtl\
-      -e =o html report
-    - name: upload results
-       uses: actions/upload-artificat@v3
-       with:
-        name: jmeter-results
-        path: results.jtl
-    - name: Upload html report
-       uses: actions/upload-artificat@v3
-       with:
+      - name: Install Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
 
-        name: html_report
-        path: HTML report
-     
+      - name: Download JMeter
+        run: |
+          wget https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.6.3.tgz
+          tar -xzf apache-jmeter-5.6.3.tgz
+          export JMETER_HOME=$PWD/apache-jmeter-5.6.3
+          export PATH=$JMETER_HOME/bin:$PATH
 
- 
+      - name: Run JMeter Test Plan
+        run: |
+          mkdir results
+          jmeter -n \
+                 -t jmeter/test-plan.jmx \
+                 -l results/results.jtl \
+                 -e -o results/report
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: jmeter-report
+          path: results
