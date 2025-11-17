@@ -1,0 +1,35 @@
+name: Performance Pipeline Practice
+
+on:
+ workflow_dispatch:
+jobs:
+ performance-test:
+  runs-on: ubuntu-latest
+  steps:
+   - name: checkout code
+     uses: actions/checkout@v3
+
+   - name: Install Jmeter
+     run: |
+       sudo apt update
+       sudo apt install -y jmeter
+       - name: Run Jmter Test
+       run: |
+
+       jmeter -n -t satish.jmx \
+        -l results.jtl\
+      -e =o html report
+    - name: upload results
+       uses: actions/upload-artificat@v3
+       with:
+        name: jmeter-results
+        path: results.jtl
+    - name: Upload html report
+       uses: actions/upload-artificat@v3
+       with:
+
+        name: html_report
+        path: HTML report
+     
+
+ 
