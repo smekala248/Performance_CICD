@@ -21,16 +21,21 @@ jobs:
         run: |
           wget https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.6.3.tgz
           tar -xzf apache-jmeter-5.6.3.tgz
-          export JMETER_HOME=$PWD/apache-jmeter-5.6.3
-          export PATH=$JMETER_HOME/bin:$PATH
 
       - name: Run JMeter Test Plan
         run: |
-          mkdir results
+          # Export JMeter environment in THIS step
+          export JMETER_HOME=$PWD/apache-jmeter-5.6.3
+          export PATH=$JMETER_HOME/bin:$PATH
+
+          # Ensure results folder exists
+          mkdir -p results
+
+          # Run JMeter
           jmeter -n \
                  -t Satish_Jpet.jmx \
-                 -l results.jtl \
-                 -e -o report
+                 -l results/results.jtl \
+                 -e -o results/report
 
       - name: Upload Test Results
         uses: actions/upload-artifact@v4
